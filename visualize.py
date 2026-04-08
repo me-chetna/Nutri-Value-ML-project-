@@ -27,10 +27,18 @@ for _, row in df.iterrows():
 df['prediction'] = predictions
 
 # -----------------------------
-# GRAPH 1: Healthy vs Unhealthy Count
+# GRAPH 1: Healthy vs Unhealthy Distribution
 # -----------------------------
 counts = df['prediction'].value_counts()
 
+plt.figure()
+plt.pie(counts, labels=["Unhealthy", "Healthy"], autopct='%1.1f%%')
+plt.title("Food Health Distribution")
+plt.show()
+
+# -----------------------------
+# GRAPH 2: Healthy vs Unhealthy Count
+# -----------------------------
 plt.figure()
 counts.plot(kind='bar')
 plt.title("Healthy vs Unhealthy Foods")
@@ -39,7 +47,7 @@ plt.ylabel("Count")
 plt.show()
 
 # -----------------------------
-# GRAPH 2: Sugar vs Health
+# GRAPH 3: Sugar vs Health
 # -----------------------------
 plt.figure()
 for label in [0, 1]:
@@ -52,44 +60,3 @@ plt.title("Sugar vs Fat (Health Trend)")
 plt.legend()
 plt.show()
 
-# -----------------------------
-# GRAPH 3: Health Trend Line Graph
-# -----------------------------
-
-def health_score(sugar, protein, fat, sodium, fiber):
-    score = 100
-    score -= sugar * 2
-    score -= fat * 1.5
-    score -= sodium * 0.05
-    score += protein * 2
-    score += fiber * 3
-    return max(0, min(100, score))
-
-
-# Calculate scores
-scores = []
-
-for _, row in df.iterrows():
-    score = health_score(
-        row['sugar'],
-        row['protein'],
-        row['fat'],
-        row['sodium'],
-        row['fiber']
-    )
-    scores.append(score)
-
-df['health_score'] = scores
-
-# Plot line graph
-plt.figure()
-plt.plot(df['health_score'])
-
-# Threshold line (Healthy vs Unhealthy)
-plt.axhline(y=50)
-
-plt.title("Health Trend Across Food Items")
-plt.xlabel("Food Item Index")
-plt.ylabel("Health Score")
-
-plt.show()
