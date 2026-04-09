@@ -17,13 +17,13 @@ ingredients_pool = [
 ]
 
 for i in range(120):  # 120 rows
-    calories = random.randint(100, 500)
     sugar = random.randint(0, 30)
     protein = random.randint(1, 25)
     fat = random.randint(1, 25)
     sodium = random.randint(50, 1000)
     carbs = random.randint(10, 70)
     fiber = random.randint(0, 10)
+    calories = (4 * protein) + (4 * carbs) + (9 * fat)
 
     ingredients = random.choice(ingredients_pool)
 
