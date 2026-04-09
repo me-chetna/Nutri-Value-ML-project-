@@ -79,12 +79,6 @@ if st.button("Analyze Food"):
 
     st.subheader("Results")
 
-    # Prediction
-    if prediction[0] == 1:
-        st.success("Healthy ✅")
-    else:
-        st.error("Unhealthy ❌")
-
     # Score
     st.write(f"### Health Score: {score}/100")
 
