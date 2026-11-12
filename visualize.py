@@ -1,23 +1,26 @@
 import pandas as pd
 import joblib
-import numpy as np
 import matplotlib.pyplot as plt
+from pathlib import Path
 
-# Load data
-df = pd.read_csv("test_data.csv")
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_DIR = BASE_DIR / "models"
 
-# Load model
-model = joblib.load("nutrition_model.pkl")
-scaler = joblib.load("scaler.pkl")
+df = pd.read_csv(BASE_DIR / "test_data.csv")
+model = joblib.load(MODEL_DIR / "nutrition_model.pkl")
+scaler = joblib.load(MODEL_DIR / "scaler.pkl")
 
 predictions = []
 
 # Generate predictions
 for _, row in df.iterrows():
-    sample = np.array([[
-        row['calories'], row['sugar'], row['protein'],
-        row['fat'], row['sodium'], row['carbohydrates'], row['fiber']
-    ]])
+    sample = pd.DataFrame([[
+        row["calories"], row["sugar"], row["protein"],
+        row["fat"], row["sodium"], row["carbohydrates"], row["fiber"]
+    ]], columns=[
+        "calories", "sugar", "protein", "fat",
+        "sodium", "carbohydrates", "fiber"
+    ])
 
     sample_scaled = scaler.transform(sample)
     pred = model.predict(sample_scaled)[0]
@@ -29,7 +32,7 @@ df['prediction'] = predictions
 # -----------------------------
 # GRAPH 1: Healthy vs Unhealthy Distribution
 # -----------------------------
-counts = df['prediction'].value_counts()
+counts = df['prediction'].value_counts().reindex([0, 1], fill_value=0)
 
 plt.figure()
 plt.pie(counts, labels=["Unhealthy", "Healthy"], autopct='%1.1f%%')

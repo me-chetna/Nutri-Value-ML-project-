@@ -1,186 +1,53 @@
-# 🍎 Smart Food Health Analyzer
+# Smart Food Health Analyzer
 
-## 📌 Project Description
+The app reads a packaged-food nutrition label, lets you verify the extracted
+values, then classifies the product with a Random Forest model.
 
-Smart Food Health Analyzer is a machine learning-based application that evaluates whether a food item is **healthy or unhealthy** using its **nutritional values and ingredients**.
+## How a scan works
 
-The system combines:
-- 🤖 Machine Learning (Random Forest Classifier)
-- ⚠️ Ingredient Risk Detection
-- 📊 Data Visualization
-- 🌐 Interactive Web UI (Streamlit)
+1. Upload a label photo or take one with the camera.
+2. EasyOCR recognizes the printed text. Its pretrained text-recognition model
+   uses deep-learning image recognition; this project does not train a custom
+   CNN because it contains no labeled nutrition-label images.
+3. The app extracts calories, sugar, protein, fat, sodium, carbohydrates, and
+   fiber. OCR results are approximate, so verify them before analysis.
+4. Choose whether the label values are per 100 g/ml or per serving. Serving
+   values are normalized to 100 g/ml before prediction.
+5. The Random Forest classifies the nutrition values and saves the result to
+   scan history.
 
-It provides both **prediction** and **explainability**, making it a complete intelligent health analysis system.
+The separate `cnn_model.py` is only an architecture/initialization demo. It
+saves random weights and is not used by the app; those weights cannot predict
+nutrition values.
 
----
+## Setup on Windows
 
-## 🚀 Features
+Run PowerShell from the repository folder:
 
-- ✅ Predict food as **Healthy / Unhealthy**
-- 📊 Generate a **Health Score (0–100)**
-- ⚠️ Detect harmful ingredients in food
-- 📦 Bulk testing using CSV datasets
-- 📈 Data visualization (graphs and trends)
-- 🌐 Interactive UI using Streamlit
-
----
-
-## 🧠 Technologies Used
-
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- Joblib
-- Matplotlib
-- Streamlit
-
----
-
-## 📂 Project Structure
-NUTRI_VAL/
-│
-├── app.py # Streamlit UI for user interaction
-├── nutrition_model.py # Model training script
-├── predict.py # Single prediction script
-├── bulk_test.py # Bulk testing using CSV file
-├── generate_test_data.py # Script to generate test dataset
-├── visualize.py # Graphs and data visualization
-│
-├── nutrition.csv # Original dataset
-├── test_data.csv # Generated dataset for testing
-│
-├── nutrition_model.pkl # Trained machine learning model
-├── scaler.pkl # Feature scaler
-│
-├── README.md # Project documentation
-└── .venv # Virtual environment
-
-
----
-
-## ⚙️ Setup Instructions
-
-### 1️⃣ Clone the repository
-
-
-git clone <your-repo-link>
-cd NUTRI_VAL
----
-
-### 2️⃣ Create Virtual Environment
-
-#### Windows:
-
+```powershell
+Set-Location .\Nutri-Value-ML-project-
 python -m venv .venv
-..venv\Scripts\activate
-
-#### Mac/Linux:
-
-python3 -m venv .venv
-source .venv/bin/activate
----
-
-### 3️⃣ Install Dependencies
-pip install pandas numpy scikit-learn joblib matplotlib streamlit
----
-
-### 4️⃣ Train the Model
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 python nutrition_model.py
+python -m streamlit run app.py
+```
 
-This will generate:
-- `nutrition_model.pkl`
-- `scaler.pkl`
----
+The first OCR scan may download EasyOCR's pretrained model files. Keep the
+terminal open while Streamlit is running.
 
-### 5️⃣ Run the Application
-streamlit run app.py
----
+## Other scripts
 
-## 🧪 Testing the Model
+From the project directory, these scripts locate their data and model files
+relative to their own script:
 
-### 🔹 Single Input Testing
-python predict.py
----
+```powershell
+python .\generate_test_data.py
+python .\bulk_test.py
+python .\predict.py
+python .\visualize.py
+```
 
-### 🔹 Generate Test Dataset
-python generate_test_data.py
----
-
-### 🔹 Bulk Testing
-python bulk_test.py
----
-
-### 🔹 Visualization
-python visualize.py
----
-
-## 📊 Model Details
-
-- Model: Random Forest Classifier
-- Features used:
-  - Calories
-  - Sugar
-  - Protein
-  - Fat
-  - Sodium
-  - Carbohydrates
-  - Fiber
-
----
-
-## ⚠️ Ingredient Analysis
-
-The system detects harmful ingredients such as:
-- High fructose corn syrup
-- Aspartame
-- Monosodium glutamate
-- Sodium benzoate
-- Trans fat
-- Artificial colors
-- Palm oil
-- Refined sugar
-
----
-
-## 📈 Health Score Logic
-
-The health score is calculated based on:
-
-- Sugar (higher → worse)
-- Fat (higher → worse)
-- Sodium (higher → worse)
-- Protein (higher → better)
-- Fiber (higher → better)
-
-### Score Interpretation:
-
-- 🟢 70–100 → Healthy
-- 🟡 40–70 → Moderate
-- 🔴 0–40 → Unhealthy
-
----
-
-## 🎯 Use Cases
-
-- Nutrition awareness
-- Food product analysis
-- Health recommendation systems
-- Educational machine learning project
-
----
-
-## 💡 Future Improvements
-
-- 📸 OCR to scan ingredients from images
-- 🌐 Backend API (Flask/FastAPI)
-- 📱 Mobile app integration
-- 🤖 AI chatbot for food recommendations
-
----
-
-## 👨‍💻 Team
-Chetna Jain
-Tanishq Bainivaal
-Kunal Hudda
----
+The Random Forest is trained on USDA food-composition data, but its Healthy /
+Unhealthy labels are generated from simple sugar, fat, and sodium thresholds.
+It is a demonstration classifier, not a medically validated assessment.

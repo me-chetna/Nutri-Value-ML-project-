@@ -1,46 +1,16 @@
+"""Command-line example for the trained Random Forest model."""
+from pathlib import Path
 import joblib
-import numpy as np
+import pandas as pd
 
-# Load model + scaler
-model = joblib.load("nutrition_model.pkl")
-scaler = joblib.load("scaler.pkl")
-
-# Example input (change values)
-calories = 250
-sugar = 12
-protein = 5
-fat = 10
-sodium = 300
-carbs = 30
-fiber = 3
-
-sample = np.array([[calories, sugar, protein, fat, sodium, carbs, fiber]])
-
-# Scale input
-sample_scaled = scaler.transform(sample)
-
-# Predict
-prediction = model.predict(sample_scaled)
-
-# Health Score Function
-def health_score(sugar, protein, fat, sodium, fiber):
-    score = 100
-
-    score -= sugar * 2
-    score -= fat * 1.5
-    score -= sodium * 0.05
-    score += protein * 2
-    score += fiber * 3
-
-    return max(0, min(100, score))
-
-
-# Use SAME values
-score = health_score(sugar, protein, fat, sodium, fiber)
-print(f"Health Score: {score}/100")
-if score > 70:
-    print("🟢 Good choice")
-elif score > 40:
-    print("🟡 Moderate choice")
-else:
-    print("🔴 Poor choice")
+ROOT = Path(__file__).resolve().parent
+bundle = joblib.load(ROOT / "models" / "nutrition_model.pkl")
+features = bundle["features"]
+labels = bundle["labels"]
+# Replace this example with verified values per 100 g/ml.
+example = {"calories": 250, "sugar": 12, "protein": 5, "fat": 10, "sodium": 300, "carbohydrates": 30, "fiber": 3}
+sample = pd.DataFrame([[example[name] for name in features]], columns=features)
+prediction = int(bundle["model"].predict(sample)[0])
+probabilities = bundle["model"].predict_proba(sample)[0]
+print("Category:", labels[prediction])
+print("Model class probabilities:", {labels[int(c)]: round(float(p), 3) for c, p in zip(bundle["model"].classes_, probabilities)})

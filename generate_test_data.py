@@ -1,7 +1,9 @@
 import pandas as pd
 import random
+from pathlib import Path
 
 rows = []
+random.seed(42)
 
 ingredients_pool = [
     "oats, almonds, milk",
@@ -35,6 +37,7 @@ df = pd.DataFrame(rows, columns=[
     "calories", "sugar", "protein", "fat", "sodium", "carbohydrates", "fiber", "ingredients"
 ])
 
-df.to_csv("test_data.csv", index=False)
+output_path = Path(__file__).resolve().with_name("test_data.csv")
+df.to_csv(output_path, index=False)
 
-print("✅ test_data.csv created successfully!")
+print(f"Test data saved to: {output_path}")
